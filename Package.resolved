@@ -1,0 +1,15 @@
+{
+  "originHash" : "cc9091f3b7f33d6d726e45d2ad913f88a7d7403e4e8c4683517080110acf2730",
+  "pins" : [
+    {
+      "identity" : "static-libgit2",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/bdewey/static-libgit2.git",
+      "state" : {
+        "revision" : "ca2b13cb2cd04365c9416803c1d7e26116b23efd",
+        "version" : "0.5.0"
+      }
+    }
+  ],
+  "version" : 3
+}

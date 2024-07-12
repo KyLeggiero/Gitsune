@@ -5,18 +5,30 @@ import PackageDescription
 
 let package = Package(
     name: "Gitsune",
-    platforms: [.macOS(.v10_15), .iOS(.v13), .tvOS(.v13), .watchOS(.v6), .macCatalyst(.v13)],
+    platforms: [
+        .macOS(.v10_15),
+        .iOS(.v13),
+        .tvOS(.v13),
+        .watchOS(.v6),
+        .macCatalyst(.v13)
+    ],
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
             name: "Gitsune",
             targets: ["Gitsune"]),
     ],
+    dependencies: [
+        .package(url: "https://github.com/bdewey/static-libgit2.git", from: "0.5.0"),
+    ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
-            name: "Gitsune"),
+            name: "Gitsune",
+            dependencies: [
+                "static-libgit2",
+            ]),
         .testTarget(
             name: "GitsuneTests",
             dependencies: ["Gitsune"]
