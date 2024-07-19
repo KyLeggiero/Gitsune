@@ -1,5 +1,5 @@
 {
-  "originHash" : "a79a6eb16d3d2632bdf5eb5a11ade845af5a5dcad7b4f540225f93bea63bf387",
+  "originHash" : "b300dcea55a7be1c2af2c307df488d27db32b5673d8e20cf0d69b87346dd568b",
   "pins" : [
     {
       "identity" : "static-libgit2",
