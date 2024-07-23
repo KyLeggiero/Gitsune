@@ -1,7 +1,9 @@
-// Copyright © 2022 Brian Dewey, Ky. Available under the MIT License, see LICENSE for details.
+// Copyright © 2022 Brian Dewey & Ky. Available under the MIT License, see LICENSE for details.
 
 import Clibgit2
 import Foundation
+
+
 
 /// Represents an error from an internal Clibgit2 API call.
 public struct GitError: Error, RawRepresentable, CustomStringConvertible, LocalizedError, Sendable {
@@ -16,17 +18,19 @@ public struct GitError: Error, RawRepresentable, CustomStringConvertible, Locali
     public let message: String?
     
     
-    public init?(rawValue: RawValue) {
+    /// This **must** be called on the same thread as the API call that generated the error to properly get the error message.
+    public init(rawValue: RawValue) {
         self.init(errorCode: rawValue)
     }
     
     
+    /// This **must** be called on the same thread as the API call that generated the error to properly get the error message.
     init(errorCode: RawValue.RawValue, apiName: String? = nil, customMessage: String? = nil) {
         self.init(errorCode: .init(errorCode), apiName: apiName, customMessage: customMessage)
     }
     
     
-    /// Initializer. Must be called on the same thread as the API call that generated the error to properly get the error message.
+    /// This **must** be called on the same thread as the API call that generated the error to properly get the error message.
     init(errorCode: RawValue, apiName: String? = nil, customMessage: String? = nil) {
         self.rawValue = errorCode
         self.apiName = apiName
@@ -38,7 +42,7 @@ public struct GitError: Error, RawRepresentable, CustomStringConvertible, Locali
             self.message = message
         }
         else if let lastErrorPointer = git_error_last() {
-            self.message = String(validatingUTF8: lastErrorPointer.pointee.message)
+            self.message = String(validatingCString: lastErrorPointer.pointee.message)
         }
         // GIT_ERROR_OS handled in `errorCode.errorMessage`
         else {
@@ -70,7 +74,7 @@ extension git_error_code: @retroactive CustomStringConvertible {
     
     
     public var errorMessage: String? {
-        // These are from the doc comments in libgit2's `errors.h`
+        // These are mostly from the doc comments in libgit2's `errors.h`
         switch self {
         case GIT_OK:              nil
 
@@ -102,17 +106,17 @@ extension git_error_code: @retroactive CustomStringConvertible {
 
         case GIT_PASSTHROUGH:     "A user-configured callback refused to act"
         case GIT_ITEROVER:        "Signals end of iteration with iterator"
-        case GIT_RETRY:           "Internal only"
+        case GIT_RETRY:           "Something threw an error marked 'for internal use only' so I've no clue what actually went wrong because it shouldn't've gotten to me"
         case GIT_EMISMATCH:       "Hashsum mismatch in object"
         case GIT_EINDEXDIRTY:     "Unsaved changes in the index would be overwritten"
         case GIT_EAPPLYFAIL:      "Patch application failed"
             
         default:
-            if let cErrorMessage = strerror(self.rawValue) {
-                String(validatingCString: cErrorMessage)
-            }
-            else if GIT_ERROR_OS.rawValue == self.rawValue {
+            if GIT_ERROR_OS.rawValue == self.rawValue {
                 String(validatingCString: strerror(errno))
+            }
+            else if let cErrorMessage = strerror(self.rawValue) {
+                String(validatingCString: cErrorMessage)
             }
             else {
                 nil
